@@ -1,0 +1,44 @@
+<%= if @current_user do %>
+  <p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-3">
+    Hello,  <span class="text-orange-500"> <%= @current_user.username %> </span>!
+  </p>
+  <div>
+    <small class="text-[0.8125rem] font-medium leading-6">
+      User ID: <%= @current_user.id %>
+    </small>
+  </div>
+  <div>
+    <small class="text-[0.8125rem] font-medium leading-6">
+      Node: <%= Node.self() %>
+    </small>
+  </div>
+    
+  
+  <div class="my-3">
+    <a
+      href="/room"
+      class="text-sm px-3 border-2 border-zinc-900 py-2  font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-orange-500"
+    >
+      Join a Room
+    </a>
+    <.link
+      navigate={~p"/auth/logout"}
+      class="text-sm px-3 border-2 border-zinc-900 py-2 ml-3 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-rose-500"
+    >
+      Logout
+    </.link>
+  </div>
+
+<% else %>
+    <p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900">
+      Create a username
+    </p>
+
+    <.simple_form :let={r} for={:user} id="login-form" action={~p"/auth/"}>
+        <.input field={{r, :username}} type="text" label="username" />
+        <:actions>
+        <.button phx-disable-with="...">Submit</.button>
+        </:actions>
+    </.simple_form>
+    
+<% end %>

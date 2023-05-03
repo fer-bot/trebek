@@ -1,0 +1,40 @@
+<div class="space-y-4">
+
+  <h2 class="flex">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-3 bg-rose-500 rounded-full text-white">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>      
+
+    <%= @users |> map_size() %> 
+  </h2>
+
+  <div>
+    <%= if @prompt do %>
+      <%= case @prompt.type do %>
+      <% :discussion -> %>
+        <p class="mt-4 pt-0 text-[1rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+          Current Prompt:
+        </p>
+        <p class="mt-0 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+          <%= @prompt.title %>
+        </p>
+
+        <.table id="responses" rows={@responses |> Enum.filter(&(!&1.hidden)) |> Enum.sort_by(&(-&1.upvotes))} >
+          <:col :let={r} label="response"><%= r.content %></:col>
+          <:col :let={r} label="upvotes">
+            <%= r.upvotes %>
+            <button phx-click="hide" phx-value-id={r.id} phx-value-user={r.user} class="p-1 ml-3 bg-red-500 rounded-full border"> <Heroicons.check solid class="h-3 w-3 stroke-current text-white" /> </button>
+          </:col>
+          
+        </.table>
+      <% end %>
+    <% else %>
+      <p class="mt-4 pt-0 text-[1rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+        Currently there is no active prompt...
+      </p>
+      <p class="mt-0 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-orange-500 mb-0">
+        Please wait and get ready!
+      </p>
+    <% end %>
+  </div>
+</div>

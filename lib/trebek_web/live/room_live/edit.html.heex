@@ -1,0 +1,46 @@
+<div>
+  <p class="mt-4 pt-0 text-[1.5rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-5">
+    Room ID: <span class="text-orange-500 underline select-all"><%= @room_id %></span> 
+  </p>
+
+  <div>
+    <a href={"/api/export-response/#{@room_id}"} target="_blank" class="text-sm px-3 border-2 border-zinc-900 py-2 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-zinc-900">Download Responses</a>
+  </div>
+  <div class="my-5 mb-8">  
+    Go to: 
+    <a href={"/room/#{@room_id}/present"} target="_blank" class="text-sm px-3 border-2 border-zinc-900 py-2   font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-zinc-900">Present Page</a>
+    <a href={"/room/#{@room_id}"} target="_blank" class="text-sm px-3 border-2 border-zinc-900 py-2 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-zinc-900">Response Page</a>
+  </div>
+
+  <p class="mt-4 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+    Current Prompts
+      <.button phx-click="add-prompt" class="mx-2 my-0 py-1">Add Prompt</.button>
+  </p>
+
+  
+
+  <%= for prompt <- @prompts_state.prompts do %>
+
+    <hr class="h-px mt-3 bg-zinc-500 border-0 dark:bg-zinc-900">
+    <.simple_form :let={f} for={:prompt} phx-submit="save">
+      <div class="hidden">
+        <.input field={{f, :id}} type="text" value={prompt.id} label="id" />
+      </div>
+      <.input field={{f, :question}} type="text" value={prompt.title} />
+      <:actions>
+        <.button phx-disable-with="Saving...">Update Prompt</.button>
+      </:actions>
+    </.simple_form>
+    <%= if prompt.id == @prompts_state.active do %>
+      <button type="button" phx-click="activate" phx-value-id={prompt.id} class="text-sm px-3 my-3 border-2 border-red-500 py-0 font-semibold leading-6 bg-red-500 text-white rounded-full ">
+        activated
+      </button>
+    <% else %>
+      <button type="button" phx-click="activate" phx-value-id={prompt.id} class="text-sm px-3 my-3 border-2 border-zinc-900 py-0 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-zinc-900">
+        activate
+      </button>
+    <% end %>
+    
+
+  <% end %>
+</div>

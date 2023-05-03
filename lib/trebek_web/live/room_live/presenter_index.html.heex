@@ -1,0 +1,34 @@
+<p class="mt-0 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-3">
+  Hello Presenter,  <span class="text-orange-500"> <%= @current_user.username %> </span>!
+</p>
+<small class="text-[0.8125rem] font-medium leading-6">
+  User ID: <%= @current_user.id %>
+</small>
+
+<p class="text-sm text-red-500 mb-5">*please save your user ID for login</p>
+
+<div>
+
+  <button phx-click="create-room" phx-disable-with="Creating..." class="text-sm px-3 border-2 border-zinc-900 py-2  font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-orange-500">
+    Create Room
+  </button>
+  
+  <br />
+  
+  <p class="ml-3 px-2 my-5 text-[0.8125rem] font-medium leading-6">
+    or
+  </p>
+
+  <.simple_form :let={f} for={:room} phx-submit="go">
+    <.input field={{f, :room_id}} type="text" label="Enter Room ID"  />
+    <.input field={{f, :action}} type="select" label="Action" class="appearance-none ml-3"
+      options={%{"manage"=> "manage", "Present" => "present"}}
+    >
+    </.input>
+    <:actions>
+      <button phx-disable-with="Loading..." class="text-sm px-3 border-2 border-zinc-900 py-2 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-orange-500"> 
+        Go to your room 
+      </button>
+    </:actions>
+  </.simple_form>
+</div>

@@ -1,0 +1,60 @@
+<%= if !@is_guest do %>
+<p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-3">
+  Hello Presenter,  <span class="text-orange-500"> <%= @current_user.username %> </span>!
+</p>
+<div>
+  <small class="text-[0.8125rem] font-medium leading-6">
+    User ID: <%= @current_user.id %>
+  </small>
+</div>
+<div>
+  <small class="text-[0.8125rem] font-medium leading-6">
+    Node: <%= Node.self() %>
+  </small>
+</div>
+  
+
+<div class="my-3">
+  <a
+    href="/room/presenter"
+    class="text-sm px-3 border-2 border-zinc-900 py-2  font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-orange-500"
+  >
+    Manage a Room
+  </a>
+  <.link
+    navigate={~p"/auth/logout"}
+    class="text-sm px-3 border-2 border-zinc-900 py-2 ml-3 font-semibold leading-6 text-zinc-700 hover:text-white rounded-full hover:bg-rose-500"
+  >
+    Logout
+  </.link>
+</div>
+<% else %>
+
+
+  <p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900">
+    Login to Your Account
+  </p>
+
+  <.simple_form :let={r} for={:user} id="login-form" action={~p"/auth/login"}>
+    <.input field={{r, :user_id}} type="text" label="user ID" />
+    <.input field={{r, :password}} type="password" label="password" />
+    <:actions>
+      <.button phx-disable-with="...">Submit</.button>
+    </:actions>
+  </.simple_form>
+
+  <%= if @current_user do %>
+    <div class="text-sm text-red-500 my-5">
+      * You are logged in as guest user. This action will log you out from this this user.
+    </div>
+  <% end %>
+
+  <div>
+    <.link
+      navigate={~p"/auth/register"}
+      class="text-sm underline leading-6 text-zinc-900 hover:text-zinc-700"
+    >
+      Don't have an account? Register now!
+    </.link>
+  </div>
+<% end %>

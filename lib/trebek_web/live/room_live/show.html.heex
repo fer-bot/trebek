@@ -1,0 +1,48 @@
+<div>
+  <div>
+    <%= if @prompt do %>
+      <%= case @prompt.type do %>
+      <% :discussion -> %>
+
+        <p class="mt-4 pt-0 text-[1rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+          Current Prompt:
+        </p>
+        <p class="mt-0 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+          <%= @prompt.title %>
+        </p>
+        
+        <%= if @can_answer || @current_user.id == @room_owner.id do %>
+        <.simple_form :let={r} for={:response} id="mcq-form" phx-submit="submit">
+          <.input field={{r, :content}} type="text" />
+          <:actions>
+            <.button phx-disable-with="Submitting...">Submit</.button>
+          </:actions>
+        </.simple_form>
+        <% end %>
+
+        <.table id="responses" rows={@responses |> Enum.filter(&(!&1.hidden)) |> Enum.sort_by(&(-&1.upvotes))} class="table-auto">
+          <:col :let={r} label="response"><%= r.content %></:col>
+          <:col :let={r} label="upvotes">
+            <%= if @can_vote || @current_user.id == @room_owner.id do %>
+              <button phx-click="upvote" phx-value-id={r.id} class="p-1 bg-zinc-900 rounded-full border"> 
+                <Heroicons.chevron_up solid class="h-3 w-3 stroke-current text-white" /> 
+              </button>
+            <% end %>
+            <%= r.upvotes %>
+          </:col>
+        </.table>
+      <% end %>
+    <% else %>
+      <p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-3">
+        Hello,  <span class="text-orange-500"> <%= @current_user.username %> </span>!
+      </p>
+      
+      <p class="mt-4 pt-0 text-[1rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-0">
+        Currently there is no active prompt...
+      </p>
+      <p class="mt-0 pt-0 text-[2rem] font-semibold leading-10 tracking-tighter text-orange-500 mb-0">
+        Please wait and get ready!
+      </p>
+    <% end %>
+  </div>
+</div>

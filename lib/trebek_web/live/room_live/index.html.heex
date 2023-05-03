@@ -1,0 +1,12 @@
+<p class="mt-4 text-[2rem] font-semibold leading-10 tracking-tighter text-zinc-900 mb-3">
+  Hello,  <span class="text-orange-500"> <%= @current_user.username %> </span>!
+</p>
+
+<div>
+  <.simple_form :let={f} for={:room} id="mcq-form" phx-submit="go">
+    <.input field={{f, :room_id}} type="text" label="Enter Room ID" />
+    <:actions>
+      <.button phx-disable-with="Loading...">Go</.button>
+    </:actions>
+  </.simple_form>
+</div>
