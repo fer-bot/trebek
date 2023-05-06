@@ -22,7 +22,7 @@ config :trebek, TrebekWeb.Endpoint,
   http: [ip: {0, 0, 0, 0}, port: String.to_integer(System.get_env("PORT", "4000"))],
   check_origin: false,
   code_reloader: true,
-  debug_errors: true,
+  debug_errors: false,
   secret_key_base: "4++UgA2ZeXn6QYbAXkW3ouab4WnAOIdDJwb+O8h2MYIGrRwxQz4FN5ycuJ3VdGlg",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},

@@ -16,6 +16,7 @@ config :trebek, TrebekWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
     formats: [html: TrebekWeb.ErrorHTML, json: TrebekWeb.ErrorJSON],
+    root_layout: {TrebekWeb.Layouts, :root},
     layout: false
   ],
   pubsub_server: Trebek.PubSub,
