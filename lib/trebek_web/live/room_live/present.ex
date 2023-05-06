@@ -72,7 +72,10 @@ defmodule TrebekWeb.RoomLive.Present do
       # |> assign(:responses, [])
       # |> assign(:users, %{} |> handle_diff(Presence.list(presence_topic), %{}))}
       _ ->
-        {:ok, socket |> redirect(to: "/room")}
+        {:ok,
+         socket
+         |> redirect(to: "/room/presenter")
+         |> put_flash(:error, "Room #{room_id} is not accessible!")}
     end
   end
 

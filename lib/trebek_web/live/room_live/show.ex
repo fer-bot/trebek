@@ -12,66 +12,73 @@ defmodule TrebekWeb.RoomLive.Show do
   def mount(%{"id" => room_id}, _session, socket) do
     presence_topic = "Presence::RoomLive<#{room_id}>"
 
-    if connected?(socket) do
-      {:ok, _} =
-        Presence.track(self(), presence_topic, socket.assigns.current_user.id, %{
-          session: UUID.uuid7(),
-          srv: Node.self()
-        })
+    case Trebek.Credo.get({"room<#{room_id}>", :owner}) do
+      nil ->
+        {:ok,
+         socket |> redirect(to: "/room") |> put_flash(:error, "Room #{room_id} does not exist!")}
 
-      Phoenix.PubSub.subscribe(Trebek.PubSub, presence_topic)
-      Trebek.RoomDaemon.subscribe(room_id)
+      _ ->
+        if connected?(socket) do
+          {:ok, _} =
+            Presence.track(self(), presence_topic, socket.assigns.current_user.id, %{
+              session: UUID.uuid7(),
+              srv: Node.self()
+            })
+
+          Phoenix.PubSub.subscribe(Trebek.PubSub, presence_topic)
+          Trebek.RoomDaemon.subscribe(room_id)
+        end
+
+        %{
+          room: %{
+            prompts_state: prompts_state,
+            vote_count: vote_count,
+            responses: {_, responses}
+          },
+          me: %{votes: user_votes, responses: user_responses}
+        } = Trebek.RoomDaemon.snapshot(room_id, socket.assigns.current_user.id)
+
+        [prompt] =
+          case prompts_state.active do
+            nil -> [nil]
+            id -> prompts_state.prompts |> Enum.filter(fn e -> e.id === id end)
+          end
+
+        IO.inspect(["responses", responses])
+        IO.inspect(["bebong", Trebek.Credo.get()])
+
+        # TODO(optimize): check whether publishing the whole list or presence-diffs
+        # on each socket is cheaper. pubsub is non-zero memory-cost operation in
+        # erlang. try bench with thousands of user.
+        {
+          :ok,
+          socket
+          |> assign(:nodes, Enum.sort([Node.self() | Node.list(:visible)]))
+          |> assign(:room_id, room_id)
+          |> assign(:room_owner, Trebek.Credo.get({"room<#{room_id}>", :owner}))
+          |> assign(
+            prompt: prompt,
+            can_vote: prompts_state.can_vote,
+            can_answer: prompts_state.can_answer
+          )
+          |> assign(
+            :responses,
+            responses
+            |> Enum.map(fn r ->
+              %DiscussionResponse{
+                id: r.id,
+                prompt: r.prompt,
+                user: r.user,
+                content: r.content,
+                upvotes: vote_count |> Map.get(r.id, 0),
+                hidden: r.hidden
+              }
+            end)
+          )
+          |> assign(:vote_count, vote_count)
+          |> assign(:users, %{} |> handle_diff(Presence.list(presence_topic), %{}))
+        }
     end
-
-    %{
-      room: %{
-        prompts_state: prompts_state,
-        vote_count: vote_count,
-        responses: {_, responses}
-      },
-      me: %{votes: user_votes, responses: user_responses}
-    } = Trebek.RoomDaemon.snapshot(room_id, socket.assigns.current_user.id)
-
-    [prompt] =
-      case prompts_state.active do
-        nil -> [nil]
-        id -> prompts_state.prompts |> Enum.filter(fn e -> e.id === id end)
-      end
-
-    IO.inspect(["responses", responses])
-    IO.inspect(["bebong", Trebek.Credo.get()])
-
-    # TODO(optimize): check whether publishing the whole list or presence-diffs
-    # on each socket is cheaper. pubsub is non-zero memory-cost operation in
-    # erlang. try bench with thousands of user.
-    {
-      :ok,
-      socket
-      |> assign(:nodes, Enum.sort([Node.self() | Node.list(:visible)]))
-      |> assign(:room_id, room_id)
-      |> assign(:room_owner, Trebek.Credo.get({"room<#{room_id}>", :owner}))
-      |> assign(
-        prompt: prompt,
-        can_vote: prompts_state.can_vote,
-        can_answer: prompts_state.can_answer
-      )
-      |> assign(
-        :responses,
-        responses
-        |> Enum.map(fn r ->
-          %DiscussionResponse{
-            id: r.id,
-            prompt: r.prompt,
-            user: r.user,
-            content: r.content,
-            upvotes: vote_count |> Map.get(r.id, 0),
-            hidden: r.hidden
-          }
-        end)
-      )
-      |> assign(:vote_count, vote_count)
-      |> assign(:users, %{} |> handle_diff(Presence.list(presence_topic), %{}))
-    }
 
     # |> assign(:problem, Trebek.Credo.get({"room<#{room_id}>", :problem}))
     # |> assign(:responses, [])
@@ -174,7 +181,7 @@ defmodule TrebekWeb.RoomLive.Show do
       ]
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Submitted!")}
   end
 
   @impl true

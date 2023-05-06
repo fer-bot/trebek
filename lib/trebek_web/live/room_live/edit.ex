@@ -21,7 +21,10 @@ defmodule TrebekWeb.RoomLive.Edit do
          )}
 
       _ ->
-        {:ok, socket |> redirect(to: ~p"/room")}
+        {:ok,
+         socket
+         |> redirect(to: ~p"/room/presenter")
+         |> put_flash(:error, "Room #{room_id} is not accessible!")}
     end
   end
 
@@ -44,7 +47,7 @@ defmodule TrebekWeb.RoomLive.Edit do
       }
     )
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Updated!")}
   end
 
   @impl true

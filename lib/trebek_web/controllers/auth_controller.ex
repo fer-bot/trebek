@@ -46,7 +46,7 @@ defmodule TrebekWeb.AuthController do
       {:error, reason} ->
         conn
         |> put_flash(:error, to_string(reason))
-        |> redirect(to: ~p"/auth")
+        |> redirect(to: ~p"/auth/login")
     end
   end
 
@@ -98,19 +98,19 @@ defmodule TrebekWeb.AuthController do
         if Argon2.verify_pass(password, hashed_password) do
           {:ok, %{id: user_id, username: username}}
         else
-          {:error, :invalid_credentials}
+          {:error, "invalid credentials!"}
         end
 
       nil ->
         Argon2.no_user_verify()
-        {:error, :invalid_credentials}
+        {:error, "invalid credentials!"}
     end
   end
 
   def is_guest?(user_id) do
     case Trebek.Credo.get({:credential, user_id}) do
       %{username: username, password: hashed_password} -> hashed_password == nil
-      nil -> {:error, :invalid_credentials}
+      nil -> {:error, "invalid credentials!"}
     end
   end
 end
