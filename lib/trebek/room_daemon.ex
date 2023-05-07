@@ -62,7 +62,8 @@ defmodule Trebek.RoomDaemon do
            id: UUID.Uniq.t(),
            prompt: UUID.Uniq.t(),
            user: UUID.Uniq.t(),
-           content: String.t()
+           content: String.t(),
+           hidden: boolean()
          }
 
   @typep state() ::
